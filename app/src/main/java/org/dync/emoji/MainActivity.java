@@ -39,18 +39,23 @@ public class MainActivity extends AppCompatActivity {
         edtEmoji = (EditText) findViewById(R.id.edt_emoji);
         btnEmoji = (Button) findViewById(R.id.btn_emoji);
 
-        btnUnicode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setEmojiToTextView1(false, editText, tvShowEmoji);
-            }
-        });
         btnEmoji.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setEmojiToTextView1(true, edtEmoji, tvShoeUnicode);
+                setEmojiToTextView(true, edtEmoji, tvShoeUnicode);
             }
         });
+        btnUnicode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setEmojiToTextView(false, editText, tvShowEmoji);
+            }
+        });
+//        String emoji = "\\ud83d\\ude01";
+        String emoji = "\\ude01";
+        String string = unicode2String(emoji);
+        System.out.printf("emoji=" + string);
+        tvShowEmoji.setText(string);
 
 //        initData();
     }
@@ -136,12 +141,15 @@ public class MainActivity extends AppCompatActivity {
         String content = "";
         String emojiStr = "An 😀awesome 😃string with a few 😉emojis!";
         String unicodeStr = "An [1f600]awesome [1f1ff][1f468][200d][1f469][200d][1f467]string with a few [1f609]emojis!";
+
         if (flag) {
 //            text = emojiStr;
-            content = EmojiUnicodeUtil.getUnicodeByEmoji(text);
+//            content = EmojiUnicodeUtil.getUnicodeByEmoji(text);
+            content = EmojiUnicodeUtil.string2Unicode(text);
         } else {
-            text = unicodeStr;
-            content = EmojiUnicodeUtil.getEmojisByUnicode(text);
+//            text = unicodeStr;
+//            content = EmojiUnicodeUtil.getEmojisByUnicode(text);
+            content = EmojiUnicodeUtil.unicode2String(text);
         }
         System.out.println(emojiStr);
         textView.setText(content);
@@ -150,6 +158,29 @@ public class MainActivity extends AppCompatActivity {
 //        for (Emoji emoji: emojis) {
 //            System.out.println("emoji" + emoji.toString());
 //        }
+    }
+
+    public static String string2Unicode(String string) {
+        StringBuffer unicode = new StringBuffer();
+        for (int i = 0; i < string.length(); i++) {
+            // 取出每一个字符
+            char c = string.charAt(i);
+            // 转换为unicode
+            unicode.append("\\u" + Integer.toHexString(c));
+        }
+        return unicode.toString();
+    }
+
+    public static String unicode2String(String unicode) {
+        StringBuffer string = new StringBuffer();
+        String[] hex = unicode.split("\\\\u");
+        for (int i = 1; i < hex.length; i++) {
+            // 转换出每一个代码点
+            int data = Integer.parseInt(hex[i], 16);
+            // 追加成string
+            string.append((char) data);
+        }
+        return string.toString();
     }
 
     /**
@@ -163,10 +194,10 @@ public class MainActivity extends AppCompatActivity {
         String unicodeStr = "An [1f600]awesome [1f1ff][1f468][200d][1f469][200d][1f467]string with a few :wink:emojis!";
 
         if (flag) {
-            editText.setText(emojiStr);
+            editText.setText(text);
 //        content = EmojiParser.parseToHtmlDecimal(emojiStr);
 //        System.out.println(content);
-            content = EmojiParser.parseToHtmlHexadecimal(emojiStr);
+            content = EmojiParser.parseToHtmlHexadecimal(text);
             System.out.println(content);
         } else {
             editText.setText(unicodeStr);

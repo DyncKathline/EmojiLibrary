@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
  */
 
 public class EmojiUnicodeUtil {
-    public static final String REGEX = "\\[(1(f|F)([a-fA-F]|[0-9]){3}|[023]([a-fA-F]|[0-9]){3})\\]";//匹配emoji表情的UNICODE
+    //    public static final String REGEX = "\\[(1(f|F)([a-fA-F]|[0-9]){3}|[023]([a-fA-F]|[0-9]){3})\\]";//匹配emoji表情的UNICODE
+    public static final String REGEX = "\\\\u[ed]([a-fA-F]|[0-9]){3}";//匹配emoji表情的UNICODE
 
     public static ArrayList<String> getMatchEmojis(String regex, String src) {
         ArrayList<String> matchList = new ArrayList<>();
@@ -28,7 +29,7 @@ public class EmojiUnicodeUtil {
     }
 
     /**
-     * 这里的如：[1f600]格式是16进制的，不能为其他进制
+     * 通过unicode得到emoji。这里的如：[1f600]格式是16进制的，不能为其他进制
      * 输入的文本格式："An [1f600]awesome [1f603]string with a few [1f609]emojis!"
      * 输出的文本格式："An 😀awesome 😃string with a few 😉emojis!";
      *
@@ -47,6 +48,14 @@ public class EmojiUnicodeUtil {
         return src;
     }
 
+    /**
+     * 通过emoji得到unicode。这里的如：[1f600]格式是16进制的，不能为其他进制
+     * 输入的文本格式："An 😀awesome 😃string with a few 😉emojis!";
+     * 输出的文本格式："An [1f600]awesome [1f603]string with a few [1f609]emojis!"
+     *
+     * @param src
+     * @return
+     */
     public static String getUnicodeByEmoji(String src) {
         char[] srcChars = src.toCharArray();
         ArrayList<String> unicodeList = new ArrayList<>();
@@ -57,7 +66,7 @@ public class EmojiUnicodeUtil {
             if (Pattern.matches(REGEX, "[" + hexUnicode + "]")) {
                 sBuffer.append('[').append(hexUnicode).append(']');
                 unicodeList.add("[" + hexUnicode + "]");
-                int charCount = Character.charCount(codepoint);
+                int charCount = Character.charCount(codepoint);//一个emoji表情占用几个字节
                 offset += charCount;
             } else {
                 sBuffer.append((char) codepoint);
@@ -65,6 +74,57 @@ public class EmojiUnicodeUtil {
             }
         }
         return sBuffer.toString();
+    }
+
+    /**
+     * 输入的文本包含如：\ud83d\ude01格式的UTF
+     * 输出的文本则显示😀
+     * @param src
+     * @return
+     */
+    public static String string2Unicode(String src) {
+        StringBuffer unicode = new StringBuffer();
+        for (int i = 0; i < src.length(); i++) {
+            // 取出每一个字符
+            char c = src.charAt(i);
+            String unicodeStr = "\\u" + Integer.toHexString(c);
+            if (Pattern.matches(REGEX, unicodeStr)) {
+                // 转换为unicode
+                unicode.append("\\u" + Integer.toHexString(c));
+            }else {
+                unicode.append(String.valueOf(c));
+            }
+        }
+        return unicode.toString();
+    }
+
+    /**
+     * 输入的文本包含如：😀
+     * 输出的文本则显示\ud83d\ude01
+     * @param src
+     * @return
+     */
+    public static String unicode2String(String src) {
+        ArrayList<String> matchEmojis = getMatchEmojis(REGEX, src);
+
+        for (String match : matchEmojis) {
+            if (match.length() > 1) {
+                String emoji = match.substring(2, match.length());
+                int unicode = Integer.parseInt(emoji, 16);
+                src = src.replace(match, new String(Character.toChars(unicode)));
+            }
+        }
+        return src;
+
+//        StringBuffer string = new StringBuffer();
+//        String[] hex = src.split("\\\\u");
+//        for (int i = 1; i < hex.length; i++) {
+//            // 转换出每一个代码点
+//            int data = Integer.parseInt(hex[i], 16);
+//            // 追加成string
+//            string.append((char) data);
+//        }
+//        return string.toString();
     }
 
     private static boolean isEmojiCharacter(int codePoint) {
