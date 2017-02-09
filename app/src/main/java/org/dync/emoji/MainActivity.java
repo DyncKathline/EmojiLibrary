@@ -2,7 +2,6 @@ package org.dync.emoji;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,18 +9,13 @@ import android.widget.TextView;
 
 import org.dync.emojilibrary.EmojiUnicodeUtil;
 import org.dync.emojilibrary.widget.EmojiParser;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView tvShoeUnicode;
     private EditText editText;
     private Button btnUnicode;
-    private JSONObject jsonObject;
 
-
-    private JSONObject emojiJson;
     private TextView tvShowEmoji;
     private EditText edtEmoji;
     private Button btnEmoji;
@@ -51,81 +45,10 @@ public class MainActivity extends AppCompatActivity {
                 setEmojiToTextView(false, editText, tvShowEmoji);
             }
         });
-//        String emoji = "\\ud83d\\ude01";
-        String emoji = "\\ude01";
-        String string = unicode2String(emoji);
+        String emoji = "\\ud83d\\ude01";//  \ud83d\ude01
+        String string = EmojiUnicodeUtil.unicode2Emoji(emoji);
         System.out.printf("emoji=" + string);
         tvShowEmoji.setText(string);
-
-//        initData();
-    }
-
-    private void initData() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("grin", 0x1F601);
-            jsonObject.put("joy", 0x1F602);
-            jsonObject.put("smile", 0x1F604);
-            jsonObject.put("sweat_smile", 0x1F605);
-            jsonObject.put("wink", 0x1F609);
-            jsonObject.put("laughing", 0x1F606);
-            jsonObject.put("blush", 0x1F60A);
-            jsonObject.put("yum", 0x1F60B);
-            jsonObject.put("relieved", 0x1F60C);
-            jsonObject.put("heart_eyes", 0x1F60D);
-            jsonObject.put("smirk", 0x1F60F);
-            jsonObject.put("sweat", 0x1F613);
-            jsonObject.put("pensive", 0x1F614);
-            jsonObject.put("confounded", 0x1F616);
-            jsonObject.put("kissing_heart", 0x1F618);
-            jsonObject.put("kissing_closed_eyes", 0x1F61A);
-            jsonObject.put("stuck_out_tongue_winking_eye", 0x1F61C);
-            jsonObject.put("stuck_out_tongue_closed_eyes", 0x1F61D);
-            jsonObject.put("angry", 0x1F620);
-            jsonObject.put("rage", 0x1F621);
-            jsonObject.put("cry", 0x1F622);
-            jsonObject.put("persevere", 0x1F623);
-            jsonObject.put("triumph", 0x1F624);
-            jsonObject.put("disappointed_relieved", 0x1F625);
-            jsonObject.put("fearful", 0x1F628);
-            jsonObject.put("weary", 0x1F629);
-            jsonObject.put("sleepy", 0x1F62A);
-            jsonObject.put("tired_face", 0x1F62B);
-            jsonObject.put("sob", 0x1F62D);
-            jsonObject.put("cold_sweat", 0x1F630);
-            jsonObject.put("scream", 0x1F631);
-            jsonObject.put("astonished", 0x1F632);
-            jsonObject.put("flushed", 0x1F633);
-            jsonObject.put("dizzy_face", 0x1F635);
-            jsonObject.put("mask", 0x1F637);
-            jsonObject.put("pray", 0x1F64F);
-            jsonObject.put("fist", 0x270A);
-            jsonObject.put("hand", 0x270B);
-            jsonObject.put("v", 0x270C);
-            jsonObject.put("heart", 0x2764);
-            jsonObject.put("relaxed", 0x263A);
-            jsonObject.put("ok_hand", 0x1F44C);
-            jsonObject.put("thumbsup", 0x1F44D);
-            jsonObject.put("thumbsdown", 0x1F44E);
-            jsonObject.put("clap", 0x1F44F);
-            jsonObject.put("broken_heart", 0x1F494);
-            jsonObject.put("cupid", 0x1F498);
-            jsonObject.put("revolving_hearts", 0x1F49E);
-            jsonObject.put("fire", 0x1F525);
-            jsonObject.put("grinning", 0x1F600);
-            jsonObject.put("innocent", 0x1F607);
-            jsonObject.put("smiling_imp", 0x1F608);
-            jsonObject.put("sunglasses", 0x1F60E);
-            jsonObject.put("expressionless", 0x1F611);
-            jsonObject.put("confused", 0x1F615);
-            jsonObject.put("kissing_smiling_eyes", 0x1F619);
-            jsonObject.put("hushed", 0x1F62F);
-            jsonObject.put("sleeping", 0x1F634);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.i("TAG", "initData: size = " + jsonObject.length());
     }
 
     /**
@@ -144,43 +67,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (flag) {
 //            text = emojiStr;
-//            content = EmojiUnicodeUtil.getUnicodeByEmoji(text);
-            content = EmojiUnicodeUtil.string2Unicode(text);
+//            content = EmojiUnicodeUtil.getEmoji2Unicode(text);
+            content = EmojiUnicodeUtil.emoji2Unicode(text);
         } else {
 //            text = unicodeStr;
-//            content = EmojiUnicodeUtil.getEmojisByUnicode(text);
-            content = EmojiUnicodeUtil.unicode2String(text);
+//            content = EmojiUnicodeUtil.getUnicode2Emojis(text);
+            content = EmojiUnicodeUtil.unicode2Emoji(text);
         }
         System.out.println(emojiStr);
         textView.setText(content);
-
-//        Collection<Emoji> emojis = EmojiManager.getAll();
-//        for (Emoji emoji: emojis) {
-//            System.out.println("emoji" + emoji.toString());
-//        }
-    }
-
-    public static String string2Unicode(String string) {
-        StringBuffer unicode = new StringBuffer();
-        for (int i = 0; i < string.length(); i++) {
-            // 取出每一个字符
-            char c = string.charAt(i);
-            // 转换为unicode
-            unicode.append("\\u" + Integer.toHexString(c));
-        }
-        return unicode.toString();
-    }
-
-    public static String unicode2String(String unicode) {
-        StringBuffer string = new StringBuffer();
-        String[] hex = unicode.split("\\\\u");
-        for (int i = 1; i < hex.length; i++) {
-            // 转换出每一个代码点
-            int data = Integer.parseInt(hex[i], 16);
-            // 追加成string
-            string.append((char) data);
-        }
-        return string.toString();
     }
 
     /**
